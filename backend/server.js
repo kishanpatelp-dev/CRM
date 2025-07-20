@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const protectedRoutes = require("./routes/protectedRoutes");
+import clientRoutes from "./routes/clientRoutes.js";
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
+app.use("/api/clients", clientRoutes);
 
 mongoose.connect(process.env.MONGO_URI).then(() => {
   console.log("MongoDB connected");

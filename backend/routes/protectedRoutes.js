@@ -1,6 +1,6 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const verifyToken = require("../middleware/authMiddleware");
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 router.get("/dashboard", verifyToken, (req, res) => {
     res.status(200).json({
@@ -9,4 +9,4 @@ router.get("/dashboard", verifyToken, (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

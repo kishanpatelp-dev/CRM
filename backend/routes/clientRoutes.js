@@ -7,15 +7,17 @@ import {
   deleteClient,
 } from "../controllers/clientController.js";
 import { protect } from "../middleware/authMiddleware.js";
+import { validateClient } from "../middleware/validateClient.js";
+import { validateRequest } from "../middleware/validateRequest.js";
 
 const router = express.Router();
 
-router.route("/").post(protect, createClient).get(protect, getClients);
+router.route("/").post(protect, validateClient, validateRequest, createClient).get(protect, getClients);
 
 router
   .route("/:id")
   .get(protect, getClientById)
-  .put(protect, updateClient)
+  .put(protect, validateClient, validateRequest, updateClient)
   .delete(protect, deleteClient);
 
 export default router;

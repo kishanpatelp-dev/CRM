@@ -1,4 +1,5 @@
 import Client from "../models/Client.js";
+import asyncHandler from "express-async-handler";
 
 const createClient = asyncHandler(async (req, res) => {
   const { name, email, phone, company, Status } = req.body;
@@ -73,11 +74,10 @@ const deleteClient = asyncHandler(async (req, res) => {
 });
 
 
-module.exports = {
+export {
   createClient,
-  getClients,   
+  getClients,
   getClientById,
-  updateClient,     
-  deleteClient
-};
-
+  updateClient,
+  deleteClient  
+}

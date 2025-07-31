@@ -8,22 +8,24 @@ import ClientList from './Context/clientList';
 import AddClient from './Context/addClient';
 import EditClient from './Context/EditClient';
 import PrivateRoute from './Context/privateRoute';
-
+import ClientProvider from './Context/clientContext';
  
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/clients/add" element={<PrivateRoute><AddClient /></PrivateRoute>} />
-        <Route path="/clients" element={<PrivateRoute><ClientList /></PrivateRoute>} />
-        <Route path="/clients/edit/:id" element={<PrivateRoute><EditClient /></PrivateRoute>} />
-        <Route path="*" element={<h1>404 Not Found</h1>} />
-      </Routes>
+      <ClientProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/clients/add" element={<PrivateRoute><AddClient /></PrivateRoute>} />
+          <Route path="/clients" element={<PrivateRoute><ClientList /></PrivateRoute>} />
+          <Route path="/clients/edit/:id" element={<PrivateRoute><EditClient /></PrivateRoute>} />
+          <Route path="*" element={<h1>404 Not Found</h1>} />
+        </Routes>
+      </ClientProvider>d
     </BrowserRouter>
   )
 }

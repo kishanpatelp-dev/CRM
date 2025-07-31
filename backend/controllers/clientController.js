@@ -2,7 +2,7 @@ import Client from "../models/Client.js";
 import asyncHandler from "express-async-handler";
 
 const createClient = asyncHandler(async (req, res) => {
-  const { name, email, phone, company, Status } = req.body;
+  const { name, email, phone, company, status } = req.body;
 
   if (!name || !email) {
     res.status(400);
@@ -14,6 +14,8 @@ const createClient = asyncHandler(async (req, res) => {
     name,
     email,
     phone,
+    company,
+    Status,
   });
 
   const createdClient = await client.save();

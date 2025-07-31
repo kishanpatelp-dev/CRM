@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import useClient from '../Context/clientContext';
+import { useClient } from '../Context/clientContext';
 import axios from '../utils/axiosInstance';
 
 const EditClient = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { fetchClients } = useClient();
-    const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '', company: '', status: 'Active' });
 
     useEffect(() => {
         const getClient = async () => {
@@ -70,6 +70,27 @@ const EditClient = () => {
                         onChange={handleChange}
                         required
                     />
+                </div>
+                <div>
+                    <label>Company:</label>
+                    <input
+                        type="text"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div>
+                    <label>Status:</label>
+                    <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                    >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="pending">Pending</option>
+                    </select>
                 </div>
                 <button type="submit">Update Client</button>
             </form>

@@ -9,7 +9,6 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -66,7 +65,12 @@ const Login = () => {
     
       alert('Login successful!');
     } catch (error) {
+        console.error('Login error:', error.response || error.message);
+        if (error.response && error.response.data && error.response.data.message) {
+        setErrors({ form: error.response.data.message });
+      } else {
       setErrors({ form: 'Login failed. Please try again.' });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -123,16 +127,6 @@ const Login = () => {
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 text-gray-600">
-              <input
-                type="checkbox"
-                name="rememberMe"
-                checked={formData.rememberMe}
-                onChange={handleChange}
-                className="accent-blue-600"
-              />
-              Remember me
-            </label>
             <Link to="/forgot-password" className="text-blue-600 hover:underline">
               Forgot password?
             </Link>

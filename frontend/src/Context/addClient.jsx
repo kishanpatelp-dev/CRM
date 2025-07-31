@@ -7,7 +7,9 @@ const AddClient = () => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        phone: ""
+        phone: "",
+        company: "",
+        status: "Active" 
     })
     const navigate = useNavigate();
     const { fetchClients } = useClient();
@@ -34,6 +36,12 @@ const AddClient = () => {
                 <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} className="border p-2 mb-4 w-full" />
                 <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="border p-2 mb-4 w-full" />
                 <input type="text" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} className="border p-2 mb-4 w-full" />
+                <input type="text" name="company" placeholder="Company" value={formData.company} onChange={handleChange} className="border p-2 mb-4 w-full" />
+                <select name="status" value={formData.status} onChange={handleChange} className="border p-2 mb-4 w-full">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="pending">Pending</option>
+                </select>
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded">Add Client</button>
             </form>
         </div>

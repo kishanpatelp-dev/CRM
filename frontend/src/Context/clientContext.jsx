@@ -1,16 +1,16 @@
-import { createContext, useState,useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import axios from "../utils/axiosInstance";
 
 const ClientContext = createContext();
 
-export const useClient = () => useContext(clientContext);
+export const useClient = () => useContext(ClientContext);
 
-export const ClientProvider = ({ children }) => {
+const ClientProvider = ({ children }) => {
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchClients = async () => {
-        try{
+        try {
             const res = await axios.get("/clients");
             setClients(res.data);
         } catch (error) {
@@ -25,9 +25,10 @@ export const ClientProvider = ({ children }) => {
     }, []);
 
     return (
-        <ClientContext.Provider value={{ clients, setClients, loading, fetchClients }}>    
+        <ClientContext.Provider value={{ clients, setClients, loading, fetchClients }}>
             {children}
         </ClientContext.Provider>
     );
-    
 };
+
+export default ClientProvider;

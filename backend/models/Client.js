@@ -8,7 +8,7 @@ const clientSchema = new mongoose.Schema({
     email: String,
     phone: String,
     company: String,
-    Status: {
+    status: {
         type: String,
         enum: ["active", "inactive", "pending"],
         default: "pending",

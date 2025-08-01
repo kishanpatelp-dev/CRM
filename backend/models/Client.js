@@ -1,24 +1,36 @@
-import mongoose from "mongoose";    
+import mongoose from "mongoose";
 
-const clientSchema = new mongoose.Schema({
+const clientSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     name: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
+      trim: true,
     },
-    email: String,
-    phone: String,
-    company: String,
+    email: {
+      type: String,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    company: {
+      type: String,
+      trim: true,
+    },
     status: {
-        type: String,
-        enum: ["active", "inactive", "pending"],
-        default: "pending",
+      type: String,
+      enum: ["active", "inactive", "pending"],
+      default: "pending",
     },
-    owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-    }
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 export default mongoose.model("Client", clientSchema);
-

@@ -12,12 +12,18 @@ import { validateRequest } from "../middleware/validateRequest.js";
 
 const router = express.Router();
 
-router.route("/").post(protect, validateClient, validateRequest, createClient).get(protect, getClients);
+router
+  .route("/")
+  .post(protect, validateClient, validateRequest, createClient)
+  .get(protect, getClients);
 
 router
   .route("/:id")
   .get(protect, getClientById)
   .put(protect, validateClient, validateRequest, updateClient)
-  .delete(protect, deleteClient);
+  .delete(protect, deleteClient); // <-- still needs protect
+
+// Fix: protect delete as well
+router.route("/:id").delete(protect, deleteClient);
 
 export default router;

@@ -23,20 +23,18 @@ const Login = () => {
     }
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
     return newErrors;
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
+    const { name, value } = e.target;
+    setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value
     }));
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -52,25 +50,23 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Login attempt with:', formData);
-      
       const res = await axios.post("/auth/login", formData);
       const { token, user } = res.data;
 
+      // Save token and user
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      // Debug log to verify token
+      console.log('Token saved, navigating to dashboard');
+      
+      // Navigate immediately after token is saved
       navigate("/dashboard");
-    
-      alert('Login successful!');
     } catch (error) {
-        console.error('Login error:', error.response || error.message);
-        if (error.response && error.response.data && error.response.data.message) {
-        setErrors({ form: error.response.data.message });
-      } else {
-      setErrors({ form: 'Login failed. Please try again.' });
-      }
+      console.error('Login error:', error.response?.data || error.message);
+      setErrors({ 
+        form: error.response?.data?.message || 'Login failed. Please try again.' 
+      });
     } finally {
       setIsSubmitting(false);
     }

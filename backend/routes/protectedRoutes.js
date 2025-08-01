@@ -1,8 +1,8 @@
 import express from "express";
 const router = express.Router();
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
 
-router.get("/dashboard", verifyToken, (req, res) => {
+router.get("/dashboard", protect, (req, res) => {
     res.status(200).json({
         message: "Dashboard accessed successfully",
         user: req.user,

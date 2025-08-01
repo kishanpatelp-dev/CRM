@@ -4,33 +4,31 @@ import asyncHandler from "express-async-handler";
 const createClient = asyncHandler(async (req, res) => {
   const { name, email, phone, company, status } = req.body;
 
-  if (!name || !email) {
-    res.status(400);
-    throw new Error("Name and email are required");
+  if (!name) {
+    return res.status(400).json({ message: "Name is required" });
   }
 
-  const client = new Client({
-    user: req.user.id,
+  const client = await Client.create({
+    user: req.user._id, 
     name,
     email,
     phone,
     company,
-    Status,
+    status: status || "pending",
   });
 
-  const createdClient = await client.save();
-  res.status(201).json(createdClient);
+  res.status(201).json(client);
 });
 
 const getClients = asyncHandler(async (req, res) => {
-  const clients = await Client.find({ user: req.user.id }); // fetch only user's clients
-  res.json(clients);
+  const clients = await Client.find({ user: req.user.id });
+  res.status(200).json(clients || []); // Return empty array instead of 404
 });
 
 const getClientById = asyncHandler(async (req, res) => {
   const client = await Client.findOne({
     _id: req.params.id,
-    user: req.user.id,
+    user: req.user._id,
   });
 
   if (!client) {
@@ -42,44 +40,29 @@ const getClientById = asyncHandler(async (req, res) => {
 
 const updateClient = asyncHandler(async (req, res) => {
   const updatedClient = await Client.findOneAndUpdate(
-    { _id: req.params.id, user: req.user.id },
+    { _id: req.params.id, user: req.user._id },
     req.body,
     { new: true }
   );
 
   if (!updatedClient) {
-    return res
-      .status(404)
-      .json({ message: "Client not found or unauthorized" });
+    return res.status(404).json({ message: "Client not found" });
   }
 
   res.status(200).json(updatedClient);
 });
 
 const deleteClient = asyncHandler(async (req, res) => {
-  try {
-    const deleted = await Client.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user.id,
-    });
+  const deleted = await Client.findOneAndDelete({
+    _id: req.params.id,
+    user: req.user._id,
+  });
 
-    if (!deleted) {
-      return res
-        .status(404)
-        .json({ message: "Client not found or unauthorized" });
-    }
-
-    res.status(200).json({ message: "Client deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete client", error });
+  if (!deleted) {
+    return res.status(404).json({ message: "Client not found" });
   }
+
+  res.status(200).json({ message: "Client deleted successfully" });
 });
 
-
-export {
-  createClient,
-  getClients,
-  getClientById,
-  updateClient,
-  deleteClient  
-}
+export { createClient, getClients, getClientById, updateClient, deleteClient };

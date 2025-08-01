@@ -18,7 +18,7 @@ export default function Layout({ children }) {
 
   const menuItems = [
     { icon: "🏠", label: "Dashboard", path: "/dashboard" },
-    { icon: "👤", label: "Contacts", path: "/contacts" },
+    { icon: "👤", label: "Clients", path: "/clients" },
     { icon: "🏢", label: "Companies", path: "/companies" },
     { icon: "📅", label: "Calendar", path: "/calendar" },
     { icon: "⚙️", label: "Settings", path: "/settings" },
@@ -28,11 +28,11 @@ export default function Layout({ children }) {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-white border-r shadow-sm transition-transform duration-200 ${
+        className={`fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto bg-white border-r border-transparent shadow-sm [border-image:linear-gradient(to_bottom,theme(colors.blue.400),theme(colors.blue.100))_1] transition-transform duration-200 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="p-5 border-b">
+        <div className="p-5 ">
           <h1 className="text-xl font-semibold">ClientFlow</h1>
           <p className="text-sm text-gray-500">Customer Management</p>
         </div>
@@ -75,7 +75,7 @@ export default function Layout({ children }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:pl-64">
         {/* Header */}
-        <header className="flex items-center justify-between bg-white border-b px-6 py-3 shadow-sm">
+        <header className="flex items-center justify-between bg-white border-r border-gray-200 px-6 py-3 shadow-sm">
           <div className="flex items-center gap-4">
             <button
               className="lg:hidden p-2 rounded-md hover:bg-gray-100"

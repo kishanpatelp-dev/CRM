@@ -8,8 +8,9 @@ const createClient = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Name is required" });
   }
 
+  // Save with logged-in user's ID
   const client = await Client.create({
-    user: req.user._id, 
+    user: req.user._id, // ensure this is coming from protect middleware
     name,
     email,
     phone,
@@ -21,9 +22,10 @@ const createClient = asyncHandler(async (req, res) => {
 });
 
 const getClients = asyncHandler(async (req, res) => {
-  const clients = await Client.find({ user: req.user.id });
-  res.status(200).json(clients || []); // Return empty array instead of 404
+  const clients = await Client.find({ user: req.user._id });
+  res.status(200).json(clients);
 });
+
 
 const getClientById = asyncHandler(async (req, res) => {
   const client = await Client.findOne({

@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import axios from "../utils/axiosInstance"; 
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useClient } from "../Context/clientContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { fetchClients } = useClient();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -53,14 +55,13 @@ const Login = () => {
       const res = await axios.post("/auth/login", formData);
       const { token, user } = res.data;
 
-      // Save token and user
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      // Debug log to verify token
       console.log('Token saved, navigating to dashboard');
-      
-      // Navigate immediately after token is saved
+
+      fetchClients();
+
       navigate("/dashboard");
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);

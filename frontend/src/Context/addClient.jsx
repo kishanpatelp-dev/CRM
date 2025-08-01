@@ -41,7 +41,7 @@ const AddClient = () => {
             const response = await axios.post("/clients", formData);
             console.log('Client added successfully:', response.data);
             await fetchClients();
-            navigate("/dashboard");
+            navigate("/clients");
         } catch (error) {
             console.error("Error adding client:", error.response || error);
             if (error.response?.status === 401) {

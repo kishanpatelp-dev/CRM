@@ -1,44 +1,210 @@
-import React from "react";
+import { useEffect, useState, useRef } from "react";
+import axios from "../utils/axiosInstance";
+import { useNavigate } from "react-router-dom";
+import Layout from "../Context/layout";
 
-const Profile = () => {
-  // For now, we'll use dummy user data. Replace with real auth/user context later.
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "Admin",
-    company: "ClientFlow CRM",
-    joinedAt: "March 2024",
+function getInitials(name, email) {
+  if (name) {
+    return name
+      .split(" ")
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }
+  if (email) return email[0].toUpperCase();
+  return "U";
+}
+
+export default function Profile() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const [profile, setProfile] = useState({
+    name: "",
+    email: "",
+    bio: "",
+    avatarUrl: "",
+    role: "user",
+  });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const fileInputRef = useRef();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get("/profile");
+        if (res.data.success) {
+          setProfile(res.data.user);
+          setPreviewUrl(res.data.user.avatarUrl || "");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [navigate]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl && avatarFile) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl, avatarFile]);
+
+  const handleChange = (e) => {
+    setProfile((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
 
+  const handleAvatarChange = (e) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0];
+      setAvatarFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const form = new FormData();
+      form.append("name", profile.name);
+      form.append("bio", profile.bio);
+      if (avatarFile) form.append("avatar", avatarFile);
+
+      const res = await axios.put("/profile", form, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (res.data.success) {
+        setProfile(res.data.user);
+        setPreviewUrl('http//localhost:5000/uploads/' + res.data.user.avatarUrl);
+        setAvatarFile(null);
+        alert("Profile updated");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error updating profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return<Layout><div className="p-6">Loading profile...</div></Layout>;
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6">My Profile</h1>
+    <Layout>
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
+        <h1 className="text-2xl font-bold mb-6">My Profile</h1>
 
-      <div className="bg-white p-6 rounded-xl shadow-md max-w-md">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="h-16 w-16 bg-yellow-500 text-white rounded-full flex items-center justify-center text-2xl font-bold">
-            {user.name.charAt(0)}
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Avatar */}
+          <div className="flex items-center gap-6">
+            <div className="relative w-24 h-24 rounded-full bg-blue-100 overflow-hidden flex items-center justify-center text-gray-500 text-xl font-semibold">
+              {previewUrl ? (
+                <img
+                  src={
+                    previewUrl.startsWith("/")
+                      ? `${window.location.origin}${previewUrl}`
+                      : previewUrl
+                  }
+                  alt="avatar"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    setPreviewUrl("");
+                  }}
+                />
+              ) : (
+                getInitials(profile.name, profile.email)
+              )}
+            </div>
+            <div>
+              <label className="cursor-pointer text-sm text-blue-600 hover:underline">
+                Change Avatar
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                  ref={fileInputRef}
+                />
+              </label>
+              {avatarFile && (
+                <button
+                  type="button"
+                  className="block text-xs text-gray-500 mt-1"
+                  onClick={() => {
+                    setAvatarFile(null);
+                    setPreviewUrl(profile.avatarUrl || "");
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Name */}
           <div>
-            <h2 className="text-xl font-semibold">{user.name}</h2>
-            <p className="text-gray-600 text-sm">{user.role}</p>
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input
+              name="name"
+              value={profile.name}
+              onChange={handleChange}
+              className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <div className="text-gray-700">
-            <span className="font-medium">Email:</span> {user.email}
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              value={profile.email}
+              disabled
+              className="mt-1 w-full px-4 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
+            />
           </div>
-          <div className="text-gray-700">
-            <span className="font-medium">Company:</span> {user.company}
+
+          {/* Bio */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Bio</label>
+            <textarea
+              name="bio"
+              value={profile.bio}
+              onChange={handleChange}
+              rows={3}
+              className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-          <div className="text-gray-700">
-            <span className="font-medium">Joined:</span> {user.joinedAt}
+
+          {/* Role */}
+          <div>
+            <span className="text-sm font-medium text-gray-700">Role:</span>{" "}
+            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm capitalize">
+              {profile.role}
+            </span>
           </div>
-        </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={saving}
+              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+            >
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
       </div>
-    </div>
+    </Layout>
   );
-};
-
-export default Profile;
+}

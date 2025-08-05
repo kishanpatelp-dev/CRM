@@ -1,19 +1,51 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "../utils/axiosInstance";
+
+const defaultAvatar = "/assets/default-avatar.svg";
 
 export default function Layout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) navigate("/login");
+    if (!token) {
+      navigate("/login");
+    }
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/profile");
+        const data = res.data;
+        if (data.success && data.user) {
+          if (data.user.avatarUrl) {
+            setAvatarUrl(data.user.avatarUrl);
+          }
+        } else {
+          console.warn("Could not load user:", data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleImgError = () => {
+    if (avatarUrl !== defaultAvatar) setAvatarUrl(defaultAvatar);
   };
 
   const menuItems = [
@@ -97,16 +129,55 @@ export default function Layout({ children }) {
               </svg>
             </button>
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">ClientFlow Dashboard</h2>
+              <h2 className="text-lg font-semibold text-gray-800">
+                ClientFlow Dashboard
+              </h2>
               <p className="text-sm text-gray-600">
                 Welcome back, manage your clients efficiently.
               </p>
             </div>
           </div>
-          <button onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition">
-                  Logout
+
+          {/* Avatar + hover dropdown */}
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <button
+                aria-label="User menu"
+                className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white font-medium uppercase focus:outline-none"
+              >
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="profile"
+                    onError={handleImgError}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>U</span>
+                )}
+              </button>
+
+              {/* dropdown on hover */}
+              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 pointer-events-auto transition-all duration-150 absolute right-0 top-full mt-2 w-48 bg-black text-white rounded-lg shadow-lg overflow-hidden text-sm z-10">
+                <div className="py-3 flex flex-col">
+                  <button
+                    onClick={() => navigate("/profile")}
+                    className="px-5 py-3 text-left hover:bg-gray-800"
+                  >
+                    My Profile
                   </button>
+                  <div className="border-t border-gray-700 my-1" />
+                  <button
+                    onClick={handleLogout}
+                    className="px-5 py-3 text-left hover:bg-gray-800"
+                  >
+                    Log Out
+                  </button>
+                </div>
+                <div className="h-1 bg-gradient-to-r from-blue-400 to-indigo-500" />
+              </div>
+            </div>
+          </div>
         </header>
 
         {/* Workspace */}

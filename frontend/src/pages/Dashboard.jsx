@@ -108,20 +108,6 @@ const Dashboard = () => {
                   <p className="text-xs text-gray-500 italic mb-4">
                     Added {formatDistanceToNow(new Date(client.createdAt), { addSuffix: true })}
                   </p>
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => navigate(`/clients/edit/${client._id}`)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(client._id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
                 </div>
               ))}
             </div>

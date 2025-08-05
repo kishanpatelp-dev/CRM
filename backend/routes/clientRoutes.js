@@ -21,9 +21,8 @@ router
   .route("/:id")
   .get(protect, getClientById)
   .put(protect, validateClient, validateRequest, updateClient)
-  .delete(protect, deleteClient); // <-- still needs protect
+  .delete(protect, deleteClient); 
 
-// Fix: protect delete as well
 router.route("/:id").delete(protect, deleteClient);
 
 export default router;

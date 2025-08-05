@@ -4,11 +4,13 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import NotFound from './pages/notFound';
 import ClientList from './Context/clientList';
 import AddClient from './Context/addClient';
 import EditClient from './Context/EditClient';
 import PrivateRoute from './Context/privateRoute';
 import ClientProvider from './Context/clientContext';
+
  
 function App() {
   return (
@@ -23,9 +25,9 @@ function App() {
           <Route path="/clients/add" element={<PrivateRoute><AddClient /></PrivateRoute>} />
           <Route path="/clients" element={<PrivateRoute><ClientList /></PrivateRoute>} />
           <Route path="/clients/edit/:id" element={<PrivateRoute><EditClient /></PrivateRoute>} />
-          <Route path="*" element={<h1>404 Not Found</h1>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      </ClientProvider>d
+      </ClientProvider>
     </BrowserRouter>
   )
 }

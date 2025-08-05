@@ -10,7 +10,7 @@ const AddClient = () => {
         email: "",
         phone: "",
         company: "",
-        status: "pending" // Changed to match MongoDB enum
+        status: "pending" 
     });
 
     const [error, setError] = useState("");

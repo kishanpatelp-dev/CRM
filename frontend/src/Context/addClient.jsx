@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { useClient } from "./clientContext";
-import Layout from "./layout";
+import Layout from "../components/layout";
 
 const AddClient = () => {
     const [formData, setFormData] = useState({

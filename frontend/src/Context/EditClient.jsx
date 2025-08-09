@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../utils/axiosInstance";
 import { useClient } from "./clientContext";
-import Layout from "./layout";
+import Layout from "../components/layout";
 
 const EditClient = () => {
   const { id } = useParams();

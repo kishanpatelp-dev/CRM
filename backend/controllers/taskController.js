@@ -2,88 +2,93 @@ import Task from "../models/Task.js";
 import Project from "../models/Project.js";
 import { updateProjectProgressAndStatus } from "../utils/projectProgress.js";
 
-
 const createTask = async (req, res) => {
   try {
-    const {
-      projectId,
-      title,
-      description,
-      dueDate,
-      assignedTo,
-      status = "pending",
-    } = req.body;
+    const { title, description, dueDate, assignee, status = "pending" } = req.body;
+    const { projectId } = req.params;
 
     const task = await Task.create({
       projectId,
       title,
       description,
       dueDate,
-      assignedTo,
+      assignee,
       status,
     });
 
     await updateProjectProgressAndStatus(projectId);
-
-    return res.status(201).json(task);
+    res.status(201).json(task);
   } catch (err) {
     console.error("createTask error:", err);
-    return res.status(500).json({ message: "Could not create task" });
+    res.status(500).json({ message: "Could not create task" });
   }
 };
-
 
 const updateTask = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { taskId } = req.params;
     const updates = req.body;
 
-    const task = await Task.findById(id);
+    const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
+    const project = await Project.findById(task.projectId);
+    const isOwner = project.owner.toString() === req.user._id.toString();
+    const isCollaborator = project.collaborators.some(
+      (c) => c.userId.toString() === req.user._id.toString()
+    );
+    if (!isOwner && !isCollaborator) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
 
     Object.assign(task, updates);
     await task.save();
-
     await updateProjectProgressAndStatus(task.projectId);
 
-    return res.json(task);
+    res.json(task);
   } catch (err) {
     console.error("updateTask error:", err);
-    return res.status(500).json({ message: "Could not update task" });
+    res.status(500).json({ message: "Could not update task" });
   }
 };
-
 
 const deleteTask = async (req, res) => {
   try {
-    const { id } = req.params;
-    const task = await Task.findById(id);
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
+    const project = await Project.findById(task.projectId);
+    const isOwner = project.owner.toString() === req.user._id.toString();
+    const isCollaborator = project.collaborators.some(
+      (c) => c.userId.toString() === req.user._id.toString()
+    );
+    if (!isOwner && !isCollaborator) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
 
-    const projectId = task.projectId;
-    await task.remove(); 
-    await updateProjectProgressAndStatus(projectId);
-
-    return res.status(204).end();
+    await task.deleteOne();
+    await updateProjectProgressAndStatus(task.projectId);
+    res.status(204).end();
   } catch (err) {
     console.error("deleteTask error:", err);
-    return res.status(500).json({ message: "Could not delete task" });
+    res.status(500).json({ message: "Could not delete task" });
   }
 };
-
 
 const getTasksForProject = async (req, res) => {
   try {
     const { projectId } = req.params;
 
+    const tasks = await Task.find({ projectId })
+      .sort({ createdAt: -1 })
+      .populate("assignee", "name email"); 
 
-    const tasks = await Task.find({ projectId }).sort({ createdAt: -1 });
-    return res.json(tasks);
+    res.json(tasks);
   } catch (err) {
     console.error("getTasksForProject error:", err);
-    return res.status(500).json({ message: "Could not fetch tasks" });
+    res.status(500).json({ message: "Could not fetch tasks" });
   }
 };
 

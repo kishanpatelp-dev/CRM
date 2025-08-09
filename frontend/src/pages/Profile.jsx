@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import Layout from "../Context/layout";
+import Layout from "../components/layout";
 
 function getInitials(name, email) {
   if (name) {

@@ -1,5 +1,5 @@
 import { useClient } from "../Context/clientContext";
-import Layout from "../Context/layout";
+import Layout from "../components/layout";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
@@ -31,27 +31,25 @@ const Dashboard = () => {
     );
   }
 
-  // Count stats
   const total = clients.length;
   const active = clients.filter((c) => c.status === "active").length;
   const pending = clients.filter((c) => c.status === "pending").length;
   const inactive = clients.filter((c) => c.status === "inactive").length;
 
-  // Sort by createdAt for recent list
   const recentClients = [...clients]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 3);
 
   const StatusBadge = ({ status }) => {
     const colors = {
-      active: "bg-green-100 text-green-800",
-      pending: "bg-yellow-100 text-yellow-800",
-      inactive: "bg-red-100 text-red-800",
+      active: "bg-green-500 text-white",
+      pending: "bg-yellow-500 text-white",
+      inactive: "bg-red-500 text-white",
     };
     return (
       <span
-        className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
-          colors[status] || "bg-gray-100 text-gray-800"
+        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+          colors[status] || "bg-gray-300 text-gray-800"
         }`}
       >
         {status}
@@ -66,7 +64,7 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
           <button
             onClick={() => navigate("/clients/add")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2 rounded-lg text-sm font-medium shadow transition duration-300 ease-in-out w-full sm:w-auto"
           >
             + Quick Add
           </button>
@@ -92,28 +90,48 @@ const Dashboard = () => {
               {recentClients.map((client) => (
                 <div
                   key={client._id}
-                  className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-100 shadow-md rounded-2xl p-6 hover:shadow-lg transition-all"
+                  className="relative bg-gradient-to-br from-blue-100/70 to-white/30 backdrop-blur-md border border-blue-100 shadow-md rounded-3xl p-6 transition-all duration-300 hover:translate-y-[-4px] hover:shadow-lg hover:shadow-blue-100"
                 >
-                  <div className="mb-3 flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-semibold text-blue-900">{client.name}</h3>
-                      <p className="text-sm text-blue-600">{client.company || "No Company"}</p>
-                    </div>
-                    <StatusBadge status={client.status} />
+                  {/* Name & Company */}
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-extrabold text-blue-900">
+                      {client.name}
+                    </h3>
+                    <p className="text-sm italic text-blue-500">
+                      {client.company || "No Company"}
+                    </p>
                   </div>
-                  <div className="text-sm text-gray-700 space-y-1 mb-3">
-                    {client.email && <p><strong>Email:</strong> {client.email}</p>}
-                    {client.phone && <p><strong>Phone:</strong> {client.phone}</p>}
+
+                  {/* Client Info */}
+                  <div className="text-base text-gray-700 space-y-1 mb-5">
+                    {client.email && (
+                      <p>
+                        <span className="font-medium text-gray-600">Email:</span>{" "}
+                        {client.email}
+                      </p>
+                    )}
+                    {client.phone && (
+                      <p>
+                        <span className="font-medium text-gray-600">Phone:</span>{" "}
+                        {client.phone}
+                      </p>
+                    )}
+                    <p>
+                      <span className="font-medium text-gray-600">Status:</span>{" "}
+                      <StatusBadge status={client.status} />
+                    </p>
+                    <p className="text-xs text-gray-400 italic mt-2">
+                      Created{" "}
+                      {formatDistanceToNow(new Date(client.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 italic mb-4">
-                    Added {formatDistanceToNow(new Date(client.createdAt), { addSuffix: true })}
-                  </p>
                 </div>
               ))}
             </div>
           )}
         </div>
-
       </div>
     </Layout>
   );

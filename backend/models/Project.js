@@ -1,74 +1,66 @@
 import mongoose from "mongoose";
 
-const collaboratorSchema = new mongoose.Schema({
-    uesrId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-    role: {
-        type: String,
-        enum: ["admin", "editor", "viewer"],
-        default: "viewer",
-    },    
+const collaboiratorSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ["admin", "editor", "viewer"],
+    default: "viewer",
+  },
 });
 
-const projectSchema = new mongoose.Schema({
+const projectSchema = new mongoose.Schema(
+  {
     clientId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Client",
-        required: true, 
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Client",
     },
     name: {
-        type: String,
-        required: true,
-        trim: true,
+      type: String,
+      required: true,
+      trim: true,
     },
     description: {
-        type: String,
-        trim: true,
+      type: String,
+      trim: true,
     },
-    collaborators: [collaboratorSchema],
+    collaborators: [collaboiratorSchema],
     status: {
-        type: String,
-        enum: ["pending", "in-progress", "completed", "archived"],
-        default: "pending",
+      type: String,
+      enum: ["pending", "in-progress", "completed", "archived"],
+      default: "pending",
     },
     progress: {
-        type: Number,
-        min: 0,
-        max: 100,
-        default: 0,
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
     },
     startDate: {
-        type: Date,
-        default: Date.now,
+      type: Date,
+      default: Date.now,
     },
     endDate: {
-        type: Date, 
-        required: false,
-
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
+      type: Date,
     },
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-}, {
-    timestamps: true,
-});
+  },
+  { timestamps: true }
+);
 
-projectSchema.virtual("isOverdue").get(function() {
-    return this.status != "Completed" && this.endDate && this.endDate < new Date();
-}); 
+projectSchema.virtual("isOverdue").get(function () {
+  return (
+    this.status !== "completed" && this.endDate && this.endDate < new Date()
+  );
+});
 
 const Project = mongoose.model("Project", projectSchema);
 export default Project;

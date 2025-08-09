@@ -8,14 +8,11 @@ import {
   getTasksForProject,
 } from "../controllers/taskController.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
-router.post("/create/:projectId", protect, canEditProject, createTask);
-
-router.get("/project/:projectId", protect, canEditProject, getTasksForProject);
-
-router.put("/update/:taskId", protect, canEditProject, updateTask);
-
-router.delete("/delete/:taskId", protect, canEditProject, deleteTask);
+router.get("/", protect, canEditProject, getTasksForProject);
+router.post("/", protect, canEditProject, createTask);
+router.put("/:taskId", protect, canEditProject, updateTask);
+router.delete("/:taskId", protect, canEditProject, deleteTask);
 
 export default router;
